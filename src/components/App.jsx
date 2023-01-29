@@ -11,14 +11,27 @@ class App extends Component {
     filter: '',
   };
 
+  componentDidMount() {
+    const contacts = localStorage.getItem('contacts');
+    const parsedContact = JSON.parse(contacts);
+    if(parsedContact) {
+      this.setState({contacts: parsedContact})
+    }
+    
+  };
+
+  componentDidUpdate(prevProps, prevState) {
+    if(this.state.contacts !== prevState.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts))
+    }
+  };
+
   addContact = ({ name, number }) => {
     const { contacts } = this.state;
-    const newContact = { id: nanoid(), name, number };
- 
     if (contacts.some(contact => contact.name === name)) {
       alert(`${name} is already in contacts.`,)
     } else { this.setState(({ contacts }) => ({
-      contacts: [newContact, ...contacts],
+      contacts: [{ id: nanoid(), name, number }, ...contacts],
     }));}
       
   };
@@ -39,21 +52,6 @@ class App extends Component {
     return contacts.filter(({ name }) =>
       name.toLowerCase().includes(normalizedFilter)
     );
-  };
-
-  componentDidMount() {
-    const contacts = localStorage.getItem('contacts');
-    const parsedContact = JSON.parse(contacts);
-    if(parsedContact) {
-      this.setState({contacts: parsedContact})
-    }
-    
-  };
-
-  componentDidUpdate(prevProps, prevState) {
-    if(this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts))
-    }
   };
 
   render() {
